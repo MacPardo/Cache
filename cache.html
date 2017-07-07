@@ -17,10 +17,36 @@
 
     <script>
 
-     function btt(i){
-       pad = "00000000";
+     function btt(i, bits){
+       pad = "";
+       while (bits--) pad += "0";
        return pad.substring(0, pad.length - i.toString(2).length) + i.toString(2);
      }
+
+     function find_td(td, table) {
+       for (i = 1; i < table.childNodes.length; i++) {
+         for (j = 1; j < table.childNodes[1].childNodes.length; j++) {
+           if (td == table.childNodes[i].childNodes[j]) {
+             return [i, j]; //y, x
+           }
+         }
+       }
+       alert("banana");
+     }
+
+     function color_address(td, table, color) {
+       pos = find_td(td, table); //y, x
+       var y = pos[0];
+       var x = pos[1];
+       console.log([y, x]);
+       var xhl = table.childNodes[0].childNodes[0].childNodes[x];
+       var yhl = table.childNodes[y].childNodes[0];
+       console.log(xhl);
+       console.log(yhl);
+       xhl.style.backgroundColor = color;
+       yhl.style.backgroundColor = color;
+     }
+
      var principal = []
      var cache = []
      //tag, dirty bit, c0, c1, c2, c3
@@ -38,8 +64,8 @@
        th.textContent = "X";
        for (i = 0; i < cols; i++) {
          th = document.createElement("th");
-         
-         th.textContent = btt(i);
+
+         th.textContent = btt(i, cols.toString(2).length);
          tr.appendChild(th);
        }
        thead.appendChild(tr);
@@ -49,13 +75,16 @@
 
          tr = document.createElement("tr");
          td = document.createElement("td");
-         
-         td.textContent = btt(i);
+
+         td.textContent = btt(i, rows.toString(2).length);
          tr.appendChild(td);
 
          for (j = 0; j < cols; j++) {
            td = document.createElement("td");
-           td.textContent = btt(0);
+           td.textContent = btt(0, 8);
+           td.style.backgroundColor = "white";
+           td.addEventListener("mouseover", function() {color_address(this, table, "red");});
+           td.addEventListener("mouseout", function() {color_address(this, table, "white");});
            tr.appendChild(td);
          }
          table.appendChild(tr);
