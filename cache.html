@@ -2,26 +2,69 @@
 <html>
   <head>
     <title>Cache Mapeamento Direto</title>
+    <meta charset="UTF-8"/>
+    <style>
+     td, th{
+       border: solid 1px;
+     }
+    </style>
   </head>
   <body>
-    <h1>Memória Principal</h1>
-    <table id="principal"></table>
     <h1>Cache</h1>
     <table id="cache"></table>
+    <h1>Memória Principal</h1>
+    <table id="principal"></table>
 
     <script>
-     principal[1024];
-     cache[16][6];
+
+     function btt(i){
+       pad = "00000000";
+       return pad.substring(0, pad.length - i.toString(2).length) + i.toString(2);
+     }
+     var principal = []
+     var cache = []
      //tag, dirty bit, c0, c1, c2, c3
 
      var dom_principal = document.querySelector("#principal");
      var dom_cache = document.querySelector("#cache");
 
-     for (i = 0; i < 32; i++) {
-       for (j = 0; j < 32; j++) {
+     var td, tr, th, strong;
+
+     function create_table(table, rows, cols) {
+       var thead = document.createElement("thead");
+       tr = document.createElement("tr");
+       th = document.createElement("th");
+       tr.appendChild(th);
+       th.textContent = "X";
+       for (i = 0; i < cols; i++) {
+         th = document.createElement("th");
          
+         th.textContent = btt(i);
+         tr.appendChild(th);
+       }
+       thead.appendChild(tr);
+       table.appendChild(thead);
+
+       for (i = 0; i < rows; i++) {
+
+         tr = document.createElement("tr");
+         td = document.createElement("td");
+         
+         td.textContent = btt(i);
+         tr.appendChild(td);
+
+         for (j = 0; j < cols; j++) {
+           td = document.createElement("td");
+           td.textContent = btt(0);
+           tr.appendChild(td);
+         }
+         table.appendChild(tr);
        }
      }
+
+     create_table(dom_principal, 16, 64);
+     create_table(dom_cache, 6, 16);
+
     </script>
   </body>
 </html>
