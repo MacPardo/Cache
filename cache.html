@@ -4,9 +4,9 @@
     <title>Cache Mapeamento Direto</title>
     <meta charset="UTF-8"/>
     <style>
-     td, th{
-       border: solid 1px;
-     }
+td, th{
+  border: solid 1px;
+}
     </style>
   </head>
   <body>
@@ -17,82 +17,84 @@
 
     <script>
 
-     function btt(i, bits){
-       pad = "";
-       while (bits--) pad += "0";
-       return pad.substring(0, pad.length - i.toString(2).length) + i.toString(2);
-     }
+    function btt(i, bits){
+      pad = "";
+      while (bits--) pad += "0";
+      return pad.substring(0, pad.length - i.toString(2).length) + i.toString(2);
+    }
 
-     function find_td(td, table) {
-       for (i = 1; i < table.childNodes.length; i++) {
-         for (j = 1; j < table.childNodes[1].childNodes.length; j++) {
-           if (td == table.childNodes[i].childNodes[j]) {
-             return [i, j]; //y, x
-           }
-         }
-       }
-       alert("banana");
-     }
+    function find_td(td, table) {
+      for (i = 1; i < table.childNodes.length; i++) {
+        for (j = 1; j < table.childNodes[1].childNodes.length; j++) {
+          if (td == table.childNodes[i].childNodes[j]) {
+            return [i, j]; //y, x
+          }
+        }
+      }
+      alert("banana");
+    }
 
-     function color_address(td, table, color) {
-       pos = find_td(td, table); //y, x
-       var y = pos[0];
-       var x = pos[1];
-       console.log([y, x]);
-       var xhl = table.childNodes[0].childNodes[0].childNodes[x];
-       var yhl = table.childNodes[y].childNodes[0];
-       console.log(xhl);
-       console.log(yhl);
-       xhl.style.backgroundColor = color;
-       yhl.style.backgroundColor = color;
-     }
+    function color_address(td, table, color) {
+      pos = find_td(td, table); 
+      //y, x
+      var y = pos[0];
+      var x = pos[1];
+      console.log([y, x]);
+      var xhl = table.childNodes[0].childNodes[0].childNodes[x];
+      var yhl = table.childNodes[y].childNodes[0];
+      console.log(xhl);
+      console.log(yhl);
+      xhl.style.backgroundColor = color;
+      yhl.style.backgroundColor = color;
+    }
 
-     var principal = []
-     var cache = []
-     //tag, dirty bit, c0, c1, c2, c3
+    var principal = []
+      var cache = []
+        //tag, dirty bit, c0, c1, c2, c3
 
-     var dom_principal = document.querySelector("#principal");
-     var dom_cache = document.querySelector("#cache");
+        var dom_principal = document.querySelector("#principal");
+      var dom_cache = document.querySelector("#cache");
 
-     var td, tr, th, strong;
+    var td, tr, th, strong;
 
-     function create_table(table, rows, cols) {
-       var thead = document.createElement("thead");
-       tr = document.createElement("tr");
-       th = document.createElement("th");
-       tr.appendChild(th);
-       th.textContent = "X";
-       for (i = 0; i < cols; i++) {
-         th = document.createElement("th");
+    function create_table(table, rows, cols) {
+      var thead = document.createElement("thead");
+      tr = document.createElement("tr");
+      th = document.createElement("th");
+      tr.appendChild(th);
+      th.textContent = "X";
+      for (i = 0; i < cols; i++) {
+        th = document.createElement("th");
 
-         th.textContent = btt(i, cols.toString(2).length);
-         tr.appendChild(th);
-       }
-       thead.appendChild(tr);
-       table.appendChild(thead);
+        th.textContent = btt(i, cols.toString(2).length - 1);
+        tr.appendChild(th);
+      }
+      thead.appendChild(tr);
+      table.appendChild(thead);
 
-       for (i = 0; i < rows; i++) {
+      for (i = 0; i < rows; i++) {
 
-         tr = document.createElement("tr");
-         td = document.createElement("td");
+        tr = document.createElement("tr");
+        td = document.createElement("td");
 
-         td.textContent = btt(i, rows.toString(2).length);
-         tr.appendChild(td);
+        td.textContent = btt(i, rows.toString(2).length - 1);
+        tr.appendChild(td);
 
-         for (j = 0; j < cols; j++) {
-           td = document.createElement("td");
-           td.textContent = btt(0, 8);
-           td.style.backgroundColor = "white";
-           td.addEventListener("mouseover", function() {color_address(this, table, "red");});
-           td.addEventListener("mouseout", function() {color_address(this, table, "white");});
-           tr.appendChild(td);
-         }
-         table.appendChild(tr);
-       }
-     }
+        for (j = 0; j < cols; j++) {
+          td = document.createElement("td");
+          td.textContent = btt(0, 8);
+          td.style.backgroundColor = "white";
+          td.addEventListener("mouseover", function() {color_address(this, table, "red");});
+          td.addEventListener("mouseout", function() {color_address(this, table, "white");});
+          tr.appendChild(td);
+        }
+        table.appendChild(tr);
+      }
+    }
 
-     create_table(dom_principal, 16, 64);
-     create_table(dom_cache, 6, 16);
+    create_table(dom_principal, 256, 4);
+    create_table(dom_cache, 16, 6);
+
 
     </script>
   </body>
