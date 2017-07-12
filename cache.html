@@ -318,6 +318,7 @@
    }
 
    function write_address() {
+     alert("wohoo");
 
      n_access++;
      n_escritas++;
@@ -332,7 +333,6 @@
      if (cache[linha_cache][1] === 0 && cache[linha_cache][0] === tag) {
        n_acertos++;
        n_acertos_escrita++;
-       cache[linha_cache][2 + offset] = value;
      }
      else {
        n_faltas++;
@@ -343,9 +343,9 @@
        cache[linha_cache][3] = principal[(input & (~3)) + 1];
        cache[linha_cache][4] = principal[(input & (~3)) + 2];
        cache[linha_cache][5] = principal[(input & (~3)) + 3];
-
-       cache[linha_cache][2 + offset] = value;
      }
+
+     cache[linha_cache][2 + offset] = value;
 
      for (i = 0; i < 4; i++) {
        principal[(input & (~3)) + i] = cache[linha_cache][2 + i];
