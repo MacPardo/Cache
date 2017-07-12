@@ -4,24 +4,24 @@
   <head>
     <title>Cache Mapeamento Direto</title>
     <style>
-body{
-  font-family: Arial;
-}
-    .m0{
-      margin:0;
-      font-weight: normal;
-    }
-    td,th{
-      border: solid 1px;
-    }
-    .dir{
-      float: right;
-      margin-right: 20%;
-    }
-    .readwrite{
-      position: absolute;
-      margin-left: 20px;
-    }
+     body{
+       font-family: Arial;
+     }
+     .m0{
+       margin:0;
+       font-weight: normal;
+     }
+     td,th{
+       border: solid 1px;
+     }
+     .dir{
+       float: right;
+       margin-right: 20%;
+     }
+     .readwrite{
+       position: absolute;
+       margin-left: 20px;
+     }
     </style>
   </head>
 
@@ -37,14 +37,14 @@ body{
         <div>
           <h3>Leitura na memória</h3>
           <input type="text" id="read_address" placeholder="Endereço">
-          <button onclick="alert('acerto')">Ler</button><br><br>
+          <button onclick="read_adress()">Ler</button><br><br>
           <input type="text" disabled="true" id="read_output" value="00000000">
         </div><br><br>
         <div>
           <h3>Escrita na memória</h3>
           <input type="text" id="write_address" placeholder="Endereço">
-          <button onclick="alert('acerto')">Escrever</button><br><br>
-          <input type="text" id="read_output" placeholder="Valor">
+          <button onclick="write_address()">Escrever</button><br><br>
+          <input type="text" id="write_output" placeholder="Valor">
         </div><br><br>
 
         <h3>Memória Principal</h3>
@@ -59,40 +59,40 @@ body{
         <table>
           <tr>
             <td>Número de acessos</td>
-            <td>  </td>
+            <td id="access"></td>
           </tr>
           <tr>
             <td>Número de acertos</td>
-            <td></td>
+            <td id="acertos"></td>
           </tr>
           <tr>
             <td>Número de faltas</td>
-            <td></td>
+            <td id="faltas"></td>
           </tr>
           <tr>
             <td>Número de leituras</td>
-            <td></td>
+            <td id="leituras"></td>
           </tr>
           <tr>
             <td>Número de escritas</td>
-            <td></td>
+            <td id="escritas"></td>
           </tr>
           <tr>
             <td>Número de acertos na leitura</td>
-            <td></td>
+            <td id="acertos_leitura"></td>
           </tr>
           <tr>
             <td>Numero de acertos na escrita</td>
-            <td></td>
+            <td id="acertos_escrita"></td>
           </tr>
           <tr>
             <td>Numero de faltas na leitura</td>
-            <td></td>
+            <td id="faltas_leitura"></td>
           </tr>
           <tr>
             <td>Numero de faltas na escrita</td>
-            <td></td>
-          </tr>	
+            <td id="faltas_escrita"></td>
+          </tr>
         </table><br><br>
         <h3>Memória Cache</h3>
         <table id="cache"></table>
@@ -103,84 +103,234 @@ body{
 
   <script>
 
-  var n_acess = 0;
+   const principal_rows = 256;
+   const principal_cols = 4;
+   const cache_rows = 16;
+   const cache_cols = 6;
 
-  function btt(i, bits){
-    pad = "";
-    while (bits--) pad += "0";
-    return pad.substring(0, pad.length - i.toString(2).length) + i.toString(2);
-  }
+   var principal = [];
+   var cache = [];
+   //tag, bit de validade, c0, c1, c2, c3
 
-  function find_td(td, table) {
-    for (i = 1; i < table.childNodes.length; i++) {
-      for (j = 1; j < table.childNodes[1].childNodes.length; j++) {
-        if (td == table.childNodes[i].childNodes[j]) {
-          return [i, j]; //y, x
-        }
-      }
-    }
-  }
+   var n_access = 0;
+   var n_acertos = 0;
+   var n_faltas = 0;
+   var n_leituras = 0;
+   var n_escritas = 0;
+   var n_acertos_leitura = 0;
+   var n_acertos_escrita = 0;
+   var n_faltas_leitura = 0;
+   var n_faltas_escrita = 0;
 
-  function color_address(td, table, color) {
-    pos = find_td(td, table); 
-    //y, x
-    var y = pos[0];
-    var x = pos[1];
-    console.log([y, x]);
-    var xhl = table.childNodes[0].childNodes[0].childNodes[x];
-    var yhl = table.childNodes[y].childNodes[0];
-    console.log(xhl);
-    console.log(yhl);
-    xhl.style.backgroundColor = color;
-    yhl.style.backgroundColor = color;
-  }
+   function atualiza_dados() {
+     document.querySelector("#access").textContent =          n_access;
+     document.querySelector("#acertos").textContent =         n_acertos;
+     document.querySelector("#faltas").textContent =          n_faltas;
+     document.querySelector("#leituras").textContent =        n_leituras;
+     document.querySelector("#escritas").textContent =        n_escritas;
+     document.querySelector("#acertos_leitura").textContent = n_acertos_leitura;
+     document.querySelector("#acertos_escrita").textContent = n_acertos_escrita;
+     document.querySelector("#faltas_leitura").textContent =  n_faltas_leitura;
+     document.querySelector("#faltas_escrita").textContent =  n_faltas_escrita;
+   }
 
-  var principal = []
-    var cache = []
-      //tag, dirty bit, c0, c1, c2, c3
+   atualiza_dados();
 
-      var dom_principal = document.querySelector("#principal");
-    var dom_cache = document.querySelector("#cache");
+   for (i = 0; i < 1024; i++) {
+     principal.push(Math.floor(Math.random() * Math.pow(2, 8)));
+   }
 
-  var td, tr, th, strong;
+   for (i = 0; i < 16; i++) {
+     cache.push([0, 1, 0, 0, 0, 0]);
+   }
 
-  function create_table(table, rows, cols) {
-    var thead = document.createElement("thead");
-    tr = document.createElement("tr");
-    th = document.createElement("th");
-    tr.appendChild(th);
-    th.textContent = "X";
-    for (i = 0; i < cols; i++) {
-      th = document.createElement("th");
+   function btt(i, bits){
+     pad = "";
+     while (bits--) pad += "0";
+     return pad.substring(0, pad.length - i.toString(2).length) + i.toString(2);
+   }
 
-      th.textContent = btt(i, cols.toString(2).length - 1);
-      tr.appendChild(th);
-    }
-    thead.appendChild(tr);
-    table.appendChild(thead);
+   function find_td(td, table) {
+     for (i = 1; i < table.childNodes.length; i++) {
+       for (j = 1; j < table.childNodes[1].childNodes.length; j++) {
+         if (td == table.childNodes[i].childNodes[j]) {
+           return [i, j]; //y, x
+         }
+       }
+     }
+   }
 
-    for (i = 0; i < rows; i++) {
+   function color_address(td, table, color) {
+     pos = find_td(td, table);
+     //y, x
+     var y = pos[0];
+     var x = pos[1];
+     console.log([y, x]);
+     var xhl = table.childNodes[0].childNodes[0].childNodes[x];
+     var yhl = table.childNodes[y].childNodes[0];
+     console.log(xhl);
+     console.log(yhl);
+     xhl.style.backgroundColor = color;
+     yhl.style.backgroundColor = color;
+   }
 
-      tr = document.createElement("tr");
-      td = document.createElement("td");
 
-      td.textContent = btt(i, rows.toString(2).length - 1);
-      tr.appendChild(td);
+   var dom_principal = document.querySelector("#principal");
+   var dom_cache = document.querySelector("#cache");
 
-      for (j = 0; j < cols; j++) {
-        td = document.createElement("td");
-        td.textContent = btt(0, 8);
-        td.style.backgroundColor = "white";
-        td.addEventListener("mouseover", function() {color_address(this, table, "red");});
-        td.addEventListener("mouseout", function() {color_address(this, table, "white");});
-        tr.appendChild(td);
-      }
-      table.appendChild(tr);
-    }
-  }
+   var td, tr, th, strong;
 
-  create_table(dom_principal, 256, 4);
-  create_table(dom_cache, 16, 6);
+   function create_table(table, rows, cols) {
+     var thead = document.createElement("thead");
+     tr = document.createElement("tr");
+     th = document.createElement("th");
+     tr.appendChild(th);
+     th.textContent = "X";
+     for (i = 0; i < cols; i++) {
+       th = document.createElement("th");
 
+       th.textContent = btt(i, cols.toString(2).length - 1);
+       tr.appendChild(th);
+     }
+     thead.appendChild(tr);
+     table.appendChild(thead);
+
+     for (i = 0; i < rows; i++) {
+
+       tr = document.createElement("tr");
+       td = document.createElement("td");
+
+       td.textContent = btt(i, rows.toString(2).length - 1);
+       tr.appendChild(td);
+
+       for (j = 0; j < cols; j++) {
+         td = document.createElement("td");
+         td.textContent = btt(principal[i * cols + j], 8);
+         td.style.backgroundColor = "white";
+         td.addEventListener("mouseover", function() {color_address(this, table, "red");});
+         td.addEventListener("mouseout", function() {color_address(this, table, "white");});
+         tr.appendChild(td);
+       }
+       table.appendChild(tr);
+     }
+   }
+
+
+   function create_cache(table, rows, cols) {
+     var thead = document.createElement("thead");
+     tr = document.createElement("tr");
+     th = document.createElement("th");
+     tr.appendChild(th);
+     th.textContent = "X";
+     for (i = 0; i < cols; i++) {
+       th = document.createElement("th");
+
+       th.textContent = btt(i, cols.toString(2).length - 1);
+       tr.appendChild(th);
+     }
+     thead.appendChild(tr);
+     table.appendChild(thead);
+
+     for (i = 0; i < rows; i++) {
+
+       tr = document.createElement("tr");
+       td = document.createElement("td");
+
+       td.textContent = btt(i, rows.toString(2).length - 1);
+       tr.appendChild(td);
+
+       for (j = 0; j < cols; j++) {
+         td = document.createElement("td");
+         if (cache[i][j] == undefined) console.log([i, j]);
+         td.textContent = btt(cache[i][j], 8);
+         td.style.backgroundColor = "white";
+         td.addEventListener("mouseover", function() {color_address(this, table, "red");});
+         td.addEventListener("mouseout", function() {color_address(this, table, "white");});
+         tr.appendChild(td);
+       }
+       table.appendChild(tr);
+     }
+   }
+
+   create_table(dom_principal, 256, 4);
+   create_cache(dom_cache, cache_rows, cache_cols);
+
+   function read_address() {
+
+     n_access++;
+
+     input = parseInt(document.querySelector("#read_address").value, 2);
+     output = document.querySelector("#read_output");
+     offset = input & 3;
+     linha_cache = (input >> 2) & 15;
+     tag = (input >> 6);
+
+     if (cache[linha_cache][1] === 0 && cache[linha_cache][0] === tag) {
+       n_acertos++;
+       n_acertos_leitura++;
+     }
+     else {
+       n_faltas++;
+       n_faltas_leitura++;
+
+       //tem que colocar o valor na cache
+       cache[linha_cache][0] = tag;
+       cache[linha_cache][1] = 0;
+       cache[linha_cache][2] = principal[input & (~3)];
+       cache[linha_cache][3] = principal[(input & (~3)) + 1];
+       cache[linha_cache][4] = principal[(input & (~3)) + 2];
+       cache[linha_cache][5] = principal[(input & (~3)) + 3];
+     }
+
+     output.value = btt(cache[linha_cache][2 + offset], 8)
+
+     dom_cache.innerHTML = "";
+     create_cache(dom_cache, cache_rows, cache_cols);
+
+     atualiza_dados();
+   }
+
+   function write_address() {
+
+     n_access++;
+     n_escritas++;
+
+     input = parseInt(document.querySelector("#write_address").value, 2);
+     value = parseInt(document.querySelector("#write_output").value, 2);
+     output = document.querySelector("#write_output");
+     offset = input & 3;
+     linha_cache = (input >> 2) & 15;
+     tag = (input >> 6);
+
+     if (cache[linha_cache][1] === 0 && cache[linha_cache][0] === tag) {
+       n_acertos++;
+       n_acertos_escrita++;
+       cache[linha_cache][2 + offset] = value;
+     }
+     else {
+       n_faltas++;
+       n_faltas_escrita++;
+       cache[linha_cache][0] = tag;
+       cache[linha_cache][1] = 0;
+       cache[linha_cache][2] = principal[input & (~3)];
+       cache[linha_cache][3] = principal[(input & (~3)) + 1];
+       cache[linha_cache][4] = principal[(input & (~3)) + 2];
+       cache[linha_cache][5] = principal[(input & (~3)) + 3];
+
+       cache[linha_cache][2 + offset] = value;
+     }
+
+     for (i = 0; i < 4; i++) {
+       principal[(input & (~3)) + i] = cache[linha_cache][2 + i];
+     }
+
+     dom_principal.innerHTML = "";
+     create_table(dom_principal, principal_rows, principal_cols);
+
+     dom_cache.innerHTML = "";
+     create_cache(dom_cache, cache_rows, cache_cols);
+
+     atualiza_dados();
+   }
   </script>
 </html>
