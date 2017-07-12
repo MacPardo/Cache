@@ -137,11 +137,12 @@
    atualiza_dados();
 
    for (i = 0; i < 1024; i++) {
-     principal.push(Math.floor(Math.random() * Math.pow(2, 8)));
+     principal.push(Math.floor(Math.random() * 255));
    }
 
    for (i = 0; i < 16; i++) {
-     cache.push([0, 1, 0, 0, 0, 0]);
+     cache.push([0, 1, Math.floor(Math.random() * 255), Math.floor(Math.random() * 255),
+                 Math.floor(Math.random() * 255), Math.floor(Math.random() * 255)]);
    }
 
    function btt(i, bits){
@@ -217,17 +218,38 @@
 
 
    function create_cache(table, rows, cols) {
+     var k;
      var thead = document.createElement("thead");
      tr = document.createElement("tr");
      th = document.createElement("th");
      tr.appendChild(th);
      th.textContent = "X";
-     for (i = 0; i < cols; i++) {
-       th = document.createElement("th");
 
-       th.textContent = btt(i, cols.toString(2).length - 1);
-       tr.appendChild(th);
-     }
+     th = document.createElement("th");
+     th.textContent = "TAG";
+     tr.appendChild(th);
+
+     th = document.createElement("th");
+     th.textContent = "BIT VAL.";
+     tr.appendChild(th);
+
+     th = document.createElement("th");
+     th.textContent = "C0";
+     tr.appendChild(th);
+
+     th = document.createElement("th");
+     th.textContent = "C1";
+     tr.appendChild(th);
+
+     th = document.createElement("th");
+     th.textContent = "C2";
+     tr.appendChild(th);
+
+     th = document.createElement("th");
+     th.textContent = "C3";
+     tr.appendChild(th);
+
+
      thead.appendChild(tr);
      table.appendChild(thead);
 
@@ -242,7 +264,12 @@
        for (j = 0; j < cols; j++) {
          td = document.createElement("td");
          if (cache[i][j] == undefined) console.log([i, j]);
-         td.textContent = btt(cache[i][j], 8);
+
+         if (j === 0) k = 4;
+         else if (j === 1) k = 1;
+         else k = 8;
+         
+         td.textContent = btt(cache[i][j], k);
          td.style.backgroundColor = "white";
          td.addEventListener("mouseover", function() {color_address(this, table, "red");});
          td.addEventListener("mouseout", function() {color_address(this, table, "white");});
