@@ -1,21 +1,109 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Cache Mapeamento Direto</title>
-    <meta charset="UTF-8"/>
-    <style>
-td, th{
-  border: solid 1px;
-}
-    </style>
-  </head>
-  <body>
-    <h1>Cache</h1>
-    <table id="cache"></table>
-    <h1>Memória Principal</h1>
-    <table id="principal"></table>
 
-    <script>
+<head>
+	<title>Cache Mapeamento Direto</title>
+	<style>
+		body{
+			font-family: Arial;
+		}
+		.m0{
+			margin:0;
+			font-weight: normal;
+		}
+		td,th{
+			border: solid 1px;
+		}
+		.dir{
+			float: right;
+			margin-right: 20%;
+		}
+		.readwrite{
+			position: absolute;
+			margin-left: 20px;
+		}
+	</style>
+</head>
+
+<body>
+	<h1 class="m0">Mapeamento direto com Write Through</h1><br>
+	<h4 class="m0">Disciplina: Organização de Computadores</h4>
+	<h4 class="m0">Professor: Jacson Luiz Matte</h4>
+	<h4 class="m0">Alunos: Adriano Diego Zortea, Gabriel Vassoler e Marcos Gobbi Adamczuk</h4>
+
+	<hr>
+	<div style="position: relative;">
+		<div class="readwrite">
+			<div>
+				<h3>Leitura na memória</h3>
+				<input type="text" id="read_address" placeholder="Endereço">
+				<button onclick="alert('acerto')">Ler</button><br><br>
+				<input type="text" disabled="true" id="read_output" value="00000000">
+			</div><br><br>
+			<div>
+				<h3>Escrita na memória</h3>
+				<input type="text" id="write_address" placeholder="Endereço">
+				<button onclick="alert('acerto')">Escrever</button><br><br>
+				<input type="text" id="read_output" placeholder="Valor">
+			</div><br><br>
+						
+    		<h3>Memória Principal</h3>
+    		<table id="principal"></table>
+
+
+		</div>
+
+		<div class="dir">
+			<h3>Estatísticas</h3>
+
+			<table>
+				<tr>
+					<td>Número de acessos</td>
+					<td>  </td>
+				</tr>
+				<tr>
+					<td>Número de acertos</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td>Número de faltas</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td>Número de leituras</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td>Número de escritas</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td>Número de acertos na leitura</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td>Numero de acertos na escrita</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td>Numero de faltas na leitura</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td>Numero de faltas na escrita</td>
+					<td></td>
+				</tr>	
+			</table><br><br>
+			<h3>Memória Cache</h3>
+   			<table id="cache"></table>
+
+		</div>
+	</div>
+</body>
+
+<script>
+
+	var n_acess = 0;
 
     function btt(i, bits){
       pad = "";
@@ -31,7 +119,6 @@ td, th{
           }
         }
       }
-      alert("banana");
     }
 
     function color_address(td, table, color) {
@@ -49,11 +136,11 @@ td, th{
     }
 
     var principal = []
-      var cache = []
+    var cache = []
         //tag, dirty bit, c0, c1, c2, c3
 
-        var dom_principal = document.querySelector("#principal");
-      var dom_cache = document.querySelector("#cache");
+    var dom_principal = document.querySelector("#principal");
+    var dom_cache = document.querySelector("#cache");
 
     var td, tr, th, strong;
 
@@ -95,7 +182,5 @@ td, th{
     create_table(dom_principal, 256, 4);
     create_table(dom_cache, 16, 6);
 
-
-    </script>
-  </body>
+</script>
 </html>
